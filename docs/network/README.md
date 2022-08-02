@@ -2,9 +2,9 @@
 The network stack contains all the resources responsible for getting traffic between the various system components.
 
 ## Routing
-![Routing diagram](network.png)
+![Routing diagram](network.svg)
 
-###Public API Gateway
+### Public API Gateway
 External traffic enters the system via an internet-facing [API Gateway](https://aws.amazon.com/api-gateway/).  For security reasons, this is the only internet-facing component of the entire system.  Endpoints can be added to this public gatway to target specific backend resources.
 
 ### NBL
@@ -28,7 +28,7 @@ You might think that send traffic to an already load-balanced service (such as L
 Technically the target group for the VPCE is made up of the IP addresses of the VPCE's [Network Interfaces](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html) (one per subnet), so this should make the path to the private gateway resiliant against the loss of an Availability Zone.
 
 #### TLS
-![Gateway diagram](gateway-tls.png)
+![Gateway diagram](gateway-tls.svg)
 
 All AWS API Gateway traffic is encrypted using TLS.  Unencrypted traffic (HTTP) is not supported.  The TLS connection is terminated at the gateway.  This means that in order to send traffic to the gateway, it must have a domain which matches the TLS certificate.  Fortunately the certificate the gateway uses takes the form `*.execute-api.<region>.amazonaws.com`.  The wildcard provides the ability to allocate subdomains to the various proxies along the way.  AWS themselves use this for presenting the VPCE corresponding to the service.
 
