@@ -1,0 +1,160 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Order Service
+  description: |-
+    Manages customer orders
+  license:
+    name: MIT
+servers:
+  - url: http://todo.add.variable.for.apigw
+paths:
+  /orders:
+    post:
+      summary: Places an order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewOrder"
+      responses:
+        '201':
+          description: The order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-amazon-apigateway-integration:
+        type: aws
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"
+        httpMethod: POST
+        credentials:
+          Fn::Sub: "${orderRole.Arn}"
+        requestTemplates:
+          application/json:
+            Fn::Sub: |
+              {
+                "TableName": "${orderTable}",
+                "Key": { "id": { "S": "$context.requestId"} },
+                "UpdateExpression": "set productId = :val1, quantity = :val2, createdOn = :val3",
+                "ExpressionAttributeValues": {
+                  ":val1": {"S": $input.json('$.productId')},
+                  ":val2": {"N": "$input.json('$.quantity')"},
+                  ":val3": {"N": "$context.requestTimeEpoch"}
+                },
+                "ReturnValues": "ALL_NEW"
+              }
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: '201'
+            responseTemplates:
+              application/json: |
+                #set($context.responseOverride.status = 201)
+                {
+                  "id": "$input.path('$.Attributes.id.S')",
+                  "productId": "$input.path('$.Attributes.productId.S')",
+                  "quantity" $input.path('$.Attributes.quantity.N')
+                  "createdOn" $input.path('$.Attributes.createdOn.N')
+                }
+    get:
+      summary: Get all orders
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-amazon-apigateway-integration:
+        type: aws
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:dynamodb:action/Scan"
+        httpMethod: POST
+        credentials:
+          Fn::Sub: "${orderRole.Arn}"
+        requestTemplates:
+          application/json:
+            Fn::Sub: |
+              {
+                  "TableName": "${orderTable}",
+                  "ProjectionExpression": "id, productId, quantity, createdOn"
+              }
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: '200'
+            responseTemplates:
+              application/json: |
+                [
+                  #foreach($elem in $input.path('Items'))
+                  {
+                    "id": "$elem.id.S",
+                    "productId": "$elem.productId.S"
+                    "quantity": $elem.quantity.N,
+                    "createdOn": $elem.createdOn.N
+                  }
+                  #if($foreach.hasNext),#end
+                  #end
+                ]
+components:
+  schemas:
+    NewOrder:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          example: "22222222-bbbb-2222-bbbb-222222222222"
+        quantity:
+          type: integer
+          example: 5
+    Order:
+      type: object
+      required:
+        - id
+        - productId
+        - quantity
+      properties:
+        id:
+          type: string
+          example: "11111111-aaaa-1111-aaaa-111111111111"
+        productId:
+          type: string
+          example: "22222222-bbbb-2222-bbbb-222222222222"
+        quantity:
+          type: integer
+          example: 5
+        createdOn:
+          type: integer
+          description: Created date/time expressed as Epoch
+          example: 1658932398
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+      

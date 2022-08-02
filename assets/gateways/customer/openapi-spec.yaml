@@ -1,0 +1,93 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Order Service
+  description: |-
+    Manages customer orders
+  license:
+    name: MIT
+servers:
+  - url: http://todo.add.variable.for.apigw
+paths:
+  /orders:
+    post:
+      summary: Places an order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewOrder"
+      responses:
+        '201':
+          description: The order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        connectionType: VPC_LINK
+        connectionId:
+          Ref: vpcLinkId
+        uri:
+          Fn::Sub: ${privateGatewayBaseUrl}/prod/orders
+        requestParameters:
+          integration.request.header.x-apigw-api-id:
+            Fn::Sub: "'${orderServiceApiId}'"
+        httpMethod: POST
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: '201'
+components:
+  schemas:
+    NewOrder:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          example: "22222222-bbbb-2222-bbbb-222222222222"
+        quantity:
+          type: integer
+          example: 5
+    Order:
+      type: object
+      required:
+        - id
+        - productId
+        - quantity
+      properties:
+        id:
+          type: string
+          example: "11111111-aaaa-1111-aaaa-111111111111"
+        productId:
+          type: string
+          example: "22222222-bbbb-2222-bbbb-222222222222"
+        quantity:
+          type: integer
+          example: 5
+        createdOn:
+          type: integer
+          description: Created date/time expressed as Epoch
+          example: 1658932398
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+      

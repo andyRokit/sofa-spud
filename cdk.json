@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/sofa-spud.ts",
+  "app": "npx ts-node --prefer-ts-exts src/sofa-spud.ts",
   "watch": {
     "include": [
       "**"
