@@ -46,6 +46,37 @@ This section describes the various use cases offered by the system.
 ![Diagram](docs/flows/ordering-stuff.svg)
 
 
+## How to Install
+The project is written using [AWS Cloud Development Kit](https://aws.amazon.com/cdk/) (CDK).
+
+### Prerequisites
+CDK requires the following:
+- [AWS CLI](https://aws.amazon.com/cli/)
+- [AWS Account and User](https://aws.amazon.com/account/sign-up)
+- [Node.js](https://nodejs.org/en/download/)
+
+### Install steps
+
+Install the AWS CDK Toolkit globally using the following Node Package Manager command.
+```
+npm install -g aws-cdk
+```
+
+Deploy (or update) the stack on your AWS account by running:
+```
+cdk deploy
+```
+
+### Tear down
+Don't forget - even example stacks cost money (and IPV4 addresses).  Once you're finished exploring a concept, tear down the stack using:
+```
+cdk destroy
+```
+
+## How to run
+TODO:  Host OpenAPI specs using Swagger.  Return Swagger URL as output from stack.  Refer to that link here.
+TODO:  If/when a UI is added to this stack, return UI URL as outpout from stack.  Reger to that link here.
+
 ## Documentation
 
 The diargams in this project were created using Google Drawings.  They're available [here](https://drive.google.com/drive/folders/1sD9AlJ1TOBfzMgbZeHh8P6m9D92N_Lia?usp=sharing) for copy/modification.
