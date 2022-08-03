@@ -1,14 +1,54 @@
-# Welcome to your CDK TypeScript project
+# Sofa Spud
+Sofa Spud is a fictional online retailer.  The purpose of this project is to act as a reference architecture for concepts which may potentially be used in production.
 
-This is a blank project for CDK development with TypeScript.
+## Benifits of a reference architecure
+Production systems can get messy.  Even with the best development practices in the world, when software comes into contact with the real world, various factors can necessetate less-than-perfect solutions.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+Production systems can also be large.  Rather than using a concept just once, it can (as should) be utalised in many places in the one system.
 
-## Useful commands
+Maintaining a "Hello World" of each new concept provices a step on the ladder below production code, which can be used to help developers:
+- Understand individual concepts used in production without having to understand every line of code around them
+- Reuse production concepts without having to reverse-engineer the production code where they're used
+- Experiment with new concepts using a lighter-weight sandbox than a fork of production code
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+## Services
+
+The business funcationality of a system is primarily implemented using *services*.  In the context of this example, services may exist to demonstrate 
+
+### Product service (placeholder)
+
+Acts as a catagogue for the products available in the system.  The Product service is an example of a **container based microservice**.
+
+### Order service (work in progress)
+
+Allows orders to be paced for specified quantities of a product.  The Order service is an example of a **serverless microservice**.
+
+See details of implementation [here](docs/order-service/README.md).
+
+## Infrastructure
+
+The services are deployed on a foundation of cloud resources.
+
+### Network
+
+The Network infrastruture creates a means of securely routing traffic from public APIs to private backend resources, and between backend resources.
+
+See details of implementation [here](docs/network/README.md).
+
+## Business flows
+
+This section describes the various use cases offered by the system.
+
+*Disclaimer: The business flows are simply there to demonstrate technical concepts.  They may not (and usually won't!) be the most effective way to implement functionality required by an online retainer.*
+
+### Ordering stuff
+
+![Diagram](docs/flows/ordering-stuff.svg)
+
+
+## Documentation
+
+The diargams in this project were created using Google Drawings.  They're available [here](https://drive.google.com/drive/folders/1sD9AlJ1TOBfzMgbZeHh8P6m9D92N_Lia?usp=sharing) for copy/modification.
+
+
+
