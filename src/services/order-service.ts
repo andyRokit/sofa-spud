@@ -21,7 +21,7 @@ export class OrderService extends Construct {
         const orderTable = new dynamodb.Table(this, 'orderTable', {
             tableName: `${props.prefix}-Order`,
             partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
-            removalPolicy: RemovalPolicy.DESTROY
+            removalPolicy: RemovalPolicy.DESTROY  
         })
 
         CdkHelper.hardcodeLogicalId(orderTable, 'orderTable')

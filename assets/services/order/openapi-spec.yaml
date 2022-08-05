@@ -19,7 +19,7 @@ paths:
               $ref: "#/components/schemas/NewOrder"
       responses:
         '201':
-          description: The order created
+          description: Create success
           content:
             application/json:
               schema:
@@ -51,7 +51,7 @@ paths:
                 },
                 "ReturnValues": "ALL_NEW"
               }
-        passthroughBehavior: when_no_match
+        passthroughBehavior: never
         responses:
           default:
             statusCode: '201'
@@ -61,14 +61,14 @@ paths:
                 {
                   "id": "$input.path('$.Attributes.id.S')",
                   "productId": "$input.path('$.Attributes.productId.S')",
-                  "quantity" $input.path('$.Attributes.quantity.N')
+                  "quantity" $input.path('$.Attributes.quantity.N'),
                   "createdOn" $input.path('$.Attributes.createdOn.N')
                 }
     get:
       summary: Get all orders
       responses:
         '200':
-          description: List of orders
+          description: Get success
           content:
             application/json:
               schema:
@@ -95,7 +95,7 @@ paths:
                   "TableName": "${orderTable}",
                   "ProjectionExpression": "id, productId, quantity, createdOn"
               }
-        passthroughBehavior: when_no_match
+        passthroughBehavior: never
         responses:
           default:
             statusCode: '200'
@@ -112,6 +112,61 @@ paths:
                   #if($foreach.hasNext),#end
                   #end
                 ]
+  /orders/{id}:
+    put:
+      summary: Updates an order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewOrder"
+      responses:
+        '200':
+          description: Update success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-amazon-apigateway-integration:
+        type: aws
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:dynamodb:action/UpdateItem"
+        httpMethod: POST
+        credentials:
+          Fn::Sub: "${orderRole.Arn}"
+        requestTemplates:
+          application/json:
+            Fn::Sub: |
+              {
+                "TableName": "${orderTable}",
+                "Key": { "id": { "S": "$input.params().path.get('id')"} },
+                "UpdateExpression": "set productId = :val1, quantity = :val2, updatedOn = :val3",
+                "ExpressionAttributeValues": {
+                  ":val1": {"S": $input.json('$.productId')},
+                  ":val2": {"N": "$input.json('$.quantity')"},
+                  ":val3": {"N": "$context.requestTimeEpoch"}
+                },
+                "ReturnValues": "ALL_NEW"
+              }
+        passthroughBehavior: never
+        responses:
+          default:
+            statusCode: '200'
+            responseTemplates:
+              application/json: |
+                {
+                  "id": "$input.path('$.Attributes.id.S')",
+                  "productId": "$input.path('$.Attributes.productId.S')",
+                  "quantity" $input.path('$.Attributes.quantity.N'),
+                  "createdOn" $input.path('$.Attributes.createdOn.N'),
+                  "updatedOn" $input.path('$.Attributes.updatedOn.N')
+                }
 components:
   schemas:
     NewOrder:
