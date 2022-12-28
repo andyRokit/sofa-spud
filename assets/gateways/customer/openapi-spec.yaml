@@ -45,6 +45,38 @@ paths:
         responses:
           default:
             statusCode: '201'
+    get:
+      summary: Get all orders
+      responses:
+        '200':
+          description: Get success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      x-amazon-apigateway-integration:
+        type: http_proxy
+        connectionType: VPC_LINK
+        connectionId:
+          Ref: vpcLinkId
+        uri:
+          Fn::Sub: ${privateGatewayBaseUrl}/prod/orders
+        requestParameters:
+          integration.request.header.x-apigw-api-id:
+            Fn::Sub: "'${orderServiceApiId}'"
+        httpMethod: GET
+        passthroughBehavior: when_no_match
+        responses:
+          default:
+            statusCode: '200'
 components:
   schemas:
     NewOrder:
