@@ -23,7 +23,10 @@ export class CustomerGateway extends NestedStack {
         const apiDefinition = CdkHelper.createApiDefinition(this, 'assets/gateways/customer/openapi-spec.yaml')
 
         this.api = new apigateway.SpecRestApi(this, `${props.prefix}-Customer-Gateway`, {
-            apiDefinition: apiDefinition
+            apiDefinition: apiDefinition,
+            deployOptions: {
+                tracingEnabled: true
+            }
         })
     }
 }

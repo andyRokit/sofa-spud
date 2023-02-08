@@ -10,10 +10,14 @@ import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources'
 export interface DynamoEventEmitterProps {
     readonly prefix: string,
     readonly table: dynamodb.Table,
-    readonly bus: events.EventBus
+    readonly bus: events.EventBus,
+    readonly entity: string
 }
 
 /**
+ * TODO:  Replace with EventBridge pipes?
+ * 
+ * 
  * Consumes DynamoDB stream events and converts them to EventBridge events on the specific Event Bus.
  * 
  * Format of produced events:
@@ -43,7 +47,7 @@ export class DynamoEventEmitter extends Construct {
             code: lambda.Code.fromAsset('assets/helpers/dynamo-event-emitter/emit-fn'),
             environment: {
                 eventBusName: props.bus.eventBusName,
-                source: props.table.tableName
+                entity: props.entity
             }
         })
 

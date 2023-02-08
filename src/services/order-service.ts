@@ -31,7 +31,8 @@ export class OrderService extends Construct {
         const eventEmitter = new DynamoEventEmitter(this, 'eventEmitter', {
             prefix: props.prefix,
             table: orderTable,
-            bus: props.bus
+            bus: props.bus,
+            entity: 'Order'
         })
 
         CdkHelper.hardcodeLogicalId(orderTable, 'orderTable')
@@ -58,6 +59,9 @@ export class OrderService extends Construct {
             apiDefinition: apiDefinition,
             endpointTypes: [apigateway.EndpointType.PRIVATE],
             policy: props.vpceResourcePolicy,
+            deployOptions: {
+                tracingEnabled: true
+            }
         })
     }
 }
