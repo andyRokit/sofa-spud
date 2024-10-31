@@ -74,6 +74,20 @@ cdk destroy
 ```
 
 ## How to run
+Retrieve the public API URL from the CloudFormation outputs.
+
+### Create an order
+Perform a HTTP `POST` to `{api}/orders` with `productId` and `quantity` attributes.  E.g.
+```
+{
+    "productId": "pizza",
+    "quantity": 2
+}
+```
+
+### Get orders
+Perform a HTTP `GET` to `{api}/orders`
+
 TODO:  Host OpenAPI specs using Swagger.  Return Swagger URL as output from stack.  Refer to that link here.
 TODO:  If/when a UI is added to this stack, return UI URL as outpout from stack.  Reger to that link here.
 
